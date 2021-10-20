@@ -1,27 +1,38 @@
-const request = require('request');
+const axios = require('axios')
 var fs = require('fs');
 const cheerio = require('cheerio');
 
-function writeToFile(filename, content) {
+function writeToFile(fileName, content) {
     var stream = fs.createWriteStream(fileName)
     stream.once('open', function () {
-        stream.end(content.html());
+        stream.end(content);
     });
 }
-function getHtml(url, cb) {
-    request(url, function (err, res, body) {
-        const $ = cheerio.load(body)
-        const content = $('.entry-content')
-        const nextUrl = content.children('p').first().find('a:eq(2)').attr('href')
-        var fileName = './' + $('.entry-title').text().replace(/\s+/g, '').replace(',') + '.html';
-
-        cb({ content: content.html(), fileName, nextUrl })
-    })
+async function getHtml(url) {
+    const res = await axios.get(url)
+    const $ = cheerio.load(res.data)
+    const content = $('.entry-content')
+    const nextUrl = content.children('p').first().find('a:eq(2)').attr('href')
+    var fileName = './' + $('.entry-title').text().replace(/\s+/g, '').replace(',', '-') + '.html';
+    return {
+        content: content.html(), fileName, nextUrl
+    }
 }
 
-getHtml('https://www.divinedaolibrary.com/martial-peak-chapter-2000-fraud/', (content, fileName, nextUrl) => {
-    if (nextUrl === 'https://www.divinedaolibrary.com/martial-peak-chapter-2003-golden-crystal-grass/') return
-    writeToFile(fileName, content)
-    getHtml(nextUrl)
-})
+async function main() {
+    try {
+        const res = await getHtml('https://www.divinedaolibrary.com/martial-peak-chapter-2000-fraud/')
+        console.log(res)
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+main()
+// getHtml('https://www.divinedaolibrary.com/martial-peak-chapter-2000-fraud/', (res) => {
+//     if (res.nextUrl === 'https://www.divinedaolibrary.com/martial-peak-chapter-2003-golden-crystal-grass/') return
+//     console.log
+//     writeToFile(res.fileName, res.content)
+//     getHtml(res.nextUrl)
+// })
 
