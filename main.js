@@ -29,11 +29,10 @@ async function getHtml(url) {
             title: $('.entry-title').text(), // *Required, title of the book.
             author: "ddl", // *Required, name of the author.
             publisher: "ddlwebscraper", // optional
+            cover: 'https://www.divinedaolibrary.com/wp-content/uploads/2017/02/i228072.jpg',
             content: [
                 {
                     data: content.html()
-                    // data: "<body>Alice was beginning to get very tired...</body>"
-                    // data: "<body>Alice was beginning to get very tired...</body>"
                 }
 
             ]
@@ -42,15 +41,15 @@ async function getHtml(url) {
         // latest
 
         if (nextUrl === '#' || 'https://www.patreon.com/Martialpeak') {
-            writeToFile(`./bin/${fileName}.html`, content.html())
+            // writeToFile(`./bin/${fileName}.html`, content.html())
             new Epub(option, `./bin/${fileName}.epub`);
             // wait for 10 mins, re fetch same url, next url again
             setTimeout(function () {
                 getHtml(url)
-            }, 3000);
+            }, 600000);
         } else {
             // make new file
-            writeToFile(`./bin/${fileName}.html`, content.html())
+            // writeToFile(`./bin/${fileName}.html`, content.html())
             new Epub(option, `./bin/${fileName}.epub`);
             getHtml(nextUrl)
         }
