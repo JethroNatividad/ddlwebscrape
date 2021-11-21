@@ -9,6 +9,7 @@ function writeToFile(fileName, content) {
         stream.end(content);
     });
 }
+
 async function getHtml(url) {
     const res = await axios.get(url)
     const $ = cheerio.load(res.data)
@@ -24,6 +25,7 @@ async function getHtml(url) {
 
     content.find('script').remove();
     content.find('img').remove();
+
     const option = {
         title: $('.entry-title').text(), // *Required, title of the book.
         author: "ddl", // *Required, name of the author.
@@ -56,7 +58,7 @@ async function getHtml(url) {
     }
 
 }
-getHtml('https://www.divinedaolibrary.com/martial-peak-chapter-2039-encountering-the-wood-spirit-again/')
+getHtml('https://www.divinedaolibrary.com/martial-peak-chapter-2442-fire-attribute-star-source/')
 
 
 
