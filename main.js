@@ -33,7 +33,10 @@ async function saveBook(url) {
     const res = await axios.get(url)
     const $ = cheerio.load(res.data)
     const content = $('.entry-content')
-    const fileName = $('.entry-title').text().replace(/\s+/g, '').replace(',', '-')
+
+    const fileName = $('.entry-title').text().replace(',', '_').replace(/\W+/g, '')
+    // remove all spaces and symbols from fileName
+
 
     // remove first 3 p and last 3 p
     content.find('p').first().remove();
@@ -74,7 +77,7 @@ async function getChapter(url, from, to) {
     }
 
 }
-getChapter('https://www.divinedaolibrary.com/martial-peak/', 2494, 2600)
+getChapter('https://www.divinedaolibrary.com/martial-peak/', 2590, 2598)
 
 
 
