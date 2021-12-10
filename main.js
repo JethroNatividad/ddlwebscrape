@@ -10,13 +10,30 @@ function writeToFile(fileName, content) {
     });
 }
 
-async function getHtml(url) {
+async function getLinks(url) {
     const res = await axios.get(url)
     const $ = cheerio.load(res.data)
     const content = $('.entry-content')
-    const nextUrl = content.children('p').first().find('a:eq(2)').attr('href')
+    const links = content.find('a').map((i, element) => {
+        // check if text match this pattern "Chapter any number"
+        if ($(element).text().match(/Chapter\s\d+/)) {
+            return {
+                href: $(element).attr('href'),
+                text: $(element).text()
+            }
+        }
+    }
+    ).get()
+    return links
+    // 'text', 'href'
+
+}
+
+async function saveBook(url) {
+    const res = await axios.get(url)
+    const $ = cheerio.load(res.data)
+    const content = $('.entry-content')
     const fileName = $('.entry-title').text().replace(/\s+/g, '').replace(',', '-')
-    console.log(nextUrl)
 
     // remove first 3 p and last 3 p
     content.find('p').first().remove();
@@ -39,26 +56,25 @@ async function getHtml(url) {
         ]
     };
 
-    // latest
+    new Epub(option, `./bin/${fileName}.epub`);
+}
 
-    if (nextUrl === '#' || nextUrl === 'https://www.patreon.com/Martialpeak') {
-        // writeToFile(`./bin/${fileName}.html`, content.html())
-        new Epub(option, `./bin/${fileName}.epub`);
-        // wait for 10 mins, re fetch same url, next url again
-        console.log('not next')
-        setTimeout(function () {
-            getHtml(url)
-        }, 600000);
-    } else {
-        console.log('NEXT')
-        // make new file
-        // writeToFile(`./bin/${fileName}.html`, content.html())
-        new Epub(option, `./bin/${fileName}.epub`);
-        getHtml(nextUrl)
+async function getChapter(url, from, to) {
+    // get links
+    const links = await getLinks(url)
+
+    for (let i = from; i <= to; i++) {
+        try {
+            const current = links.find((link) => link.text === (`Chapter ${i}`))
+            await saveBook(current.href)
+        } catch (error) {
+            console.log("No more chapters")
+            break;
+        }
     }
 
 }
-getHtml('https://www.divinedaolibrary.com/martial-peak-chapter-2442-fire-attribute-star-source/')
+getChapter('https://www.divinedaolibrary.com/martial-peak/', 2494, 2600)
 
 
 
