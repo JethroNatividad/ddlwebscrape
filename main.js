@@ -77,7 +77,21 @@ async function getChapter(url, from, to) {
     }
 
 }
-getChapter('https://www.divinedaolibrary.com/martial-peak/', 2590, 2598)
+const myArgs = process.argv.slice(2);
+let chapterStart = 0
+let chapterEnd = 99999
+
+if (!myArgs[0] && isNaN(Number(myArgs[0]))) {
+    console.log("Pass Starting Chapter Number")
+} else {
+    chapterStart = Number(myArgs[0])
+}
+if (myArgs[1] && !isNaN(Number(myArgs[1]))) {
+    chapterEnd = Number(myArgs[1])
+}
+
+
+getChapter('https://www.divinedaolibrary.com/martial-peak/', chapterStart, chapterEnd)
 
 
 
